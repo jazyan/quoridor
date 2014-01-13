@@ -1,14 +1,15 @@
 import pygame
 from pygame.locals import *
 from sys import exit
+import numpy
 import random
 
 pygame.init()
-screen = pygame.display.set_mode([480,480])
+screen = pygame.display.set_mode([470,470])
 pygame.display.set_caption("Quoridor")
 
 #create background and grid
-back = pygame.Surface((480,480))
+back = pygame.Surface((470,470))
 background = back.convert()
 background.fill((255,255,255))
 
@@ -25,24 +26,18 @@ bar_y = pygame.Surface((50,1))
 bar2 = bar_y.convert()
 bar2.fill((0,0,255))
 
-bars1 = []
-bars2 = []
-i = 0
-j = 0
-x = 60.
-y = 60.
-
-#add bars into bar list
-while i < 9:
-   (bar_x,bar_y) = (x,10)
-   bars1.append((bar_x,bar_y))
-   x+=45 
-   i+=1
-while j < 9:
-   (bar_x,bar_y) = (10,y)
-   bars2.append((bar_x,bar_y))
-   y+=45
-   j+=1
+bar_vert_x = [60,110,160,210,260,310,360,410]
+bar_vert_y = [10]*8
+bar_hor = [zip(bar_vert_y, bar_vert_x)]
+bar_vert = [zip(bar_vert_x, bar_vert_y)]
+j = 60
+for i in range(0,8):
+   bar_vert_y = [j]*8
+   zipper_vert = zip(bar_vert_x,bar_vert_y)
+   zipper_hor = zip(bar_vert_y,bar_vert_x)
+   bar_vert.append(zipper_vert)
+   bar_hor.append(zipper_hor)
+   j += 50
 
 #loop through game
 while 1:
@@ -50,12 +45,11 @@ while 1:
       if event.type == QUIT:
          exit()
    screen.blit(background,(0,0))
-   pygame.draw.rect(screen,(0,0,0),Rect((10,10),(460,460)),5)
-   k = 0
-   while k < 9: 
-      screen.blit(bar1,bars1[k])
-      screen.blit(bar2,bars2[k])
-      k+=1
+   pygame.draw.rect(screen,(0,0,0),Rect((10,10),(450,450)),5)
+   for j in range(0,9):
+      for k in range(0,8): 
+         screen.blit(bar1,bar_vert[j][k])
+         screen.blit(bar2,bar_hor[j][k])
    pygame.display.update()
 
 # TODO
