@@ -1,7 +1,6 @@
 import pygame
 from pygame.locals import *
 from sys import exit
-import numpy
 import random
 
 class Bar(pygame.sprite.Sprite):
@@ -11,7 +10,9 @@ class Bar(pygame.sprite.Sprite):
       self.image = self.image.convert()
       self.image.fill(color)
       self.rect = self.image.get_rect()
-   #def update(self):
+   def update(self,mouse):
+      if self.rect.collidepoint(mouse):
+         self.image.fill((255,0,0))
 
 pygame.init()
 screen = pygame.display.set_mode([470,470])
@@ -30,33 +31,36 @@ circle.set_colorkey((0,0,0))
 bar_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
-bar_coord = [60,110,160,210,260,310,360,410]
+bar_coord_x = [60,110,160,210,260,310,360,410]
+bar_coord = bar_coord_x
+bar_coord_y = [10,60,110,160,210,260,310,360,410]
 
 for i in range(0,8):
-   for j in range(10,410):
-      bar_vert = Bar((0,0,255),1,50)
-      bar_vert.rect.x = bar_coord[i]
-      bar_vert.rect.y = j
+   for j in range(0,9):
+      bar_vert = Bar((0,0,0),3,50)
+      bar_vert.rect.x = bar_coord_x[i]
+      bar_vert.rect.y = bar_coord_y[j]
       bar_list.add(bar_vert)
       all_sprites_list.add(bar_vert)
-      j += 50
 
 for i in range(0,8):
-   for j in range(10,410):
-      bar_hor = Bar((0,0,255),50,1)
-      bar_hor.rect.x = j
-      bar_hor.rect.y = bar_coord[i]
+   for j in range(0,9):
+      bar_hor = Bar((0,0,0),50,3)
+      bar_hor.rect.x = bar_coord_y[j]
+      bar_hor.rect.y = bar_coord_x[i]
       bar_list.add(bar_hor)
       all_sprites_list.add(bar_hor)
-      j += 50
 
 #loop through game
 while 1:
+   mouse = pygame.mouse.get_pos()
    for event in pygame.event.get():
       if event.type == QUIT:
          exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
-         pos = pygame.mouse.get_pos()
+         all_sprites_list.update(mouse)
+      if event.type == pygame.MOUSEBUTTONUP:
+         all_sprites_list.update(mouse)
    screen.blit(background,(0,0))
    pygame.draw.rect(screen,(0,0,0),Rect((10,10),(450,450)),5)
    all_sprites_list.draw(screen)
