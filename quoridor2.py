@@ -14,19 +14,20 @@ class Bar(pygame.sprite.Sprite):
       if self.rect.collidepoint(mouse):
          self.image.fill((255,0,0))
 
+class Player(pygame.sprite.Sprite):
+   def __init__(self, image):
+      pygame.sprite.Sprite.__init__(self)
+      self.image = pygame.image.load(image)
+      self.rect = self.image.get_rect()
+
 pygame.init()
 screen = pygame.display.set_mode([470,470])
 pygame.display.set_caption("Quoridor")
 
-#create background and grid
+#create background
 back = pygame.Surface((470,470))
 background = back.convert()
 background.fill((255,255,255))
-
-circ_sur = pygame.Surface((30,30))
-circ = pygame.draw.circle(circ_sur,(0,255,0),(15,15),15)
-circle = circ_sur.convert()
-circle.set_colorkey((0,0,0))
 
 bar_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
@@ -35,6 +36,7 @@ bar_coord_x = [60,110,160,210,260,310,360,410]
 bar_coord = bar_coord_x
 bar_coord_y = [10,60,110,160,210,260,310,360,410]
 
+#create grid of bars
 for i in range(0,8):
    for j in range(0,9):
       bar_vert = Bar((0,0,0),3,50)
@@ -51,6 +53,17 @@ for i in range(0,8):
       bar_list.add(bar_hor)
       all_sprites_list.add(bar_hor)
 
+#create players
+player1 = Player('piece1.png')
+player1.rect.x = 223
+player1.rect.y = 20
+all_sprites_list.add(player1)
+
+player2 = Player('piece2.png')
+player2.rect.x = 222
+player2.rect.y = 420
+all_sprites_list.add(player2)
+
 #loop through game
 while 1:
    mouse = pygame.mouse.get_pos()
@@ -58,8 +71,6 @@ while 1:
       if event.type == QUIT:
          exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
-         all_sprites_list.update(mouse)
-      if event.type == pygame.MOUSEBUTTONUP:
          all_sprites_list.update(mouse)
    screen.blit(background,(0,0))
    pygame.draw.rect(screen,(0,0,0),Rect((10,10),(450,450)),5)
