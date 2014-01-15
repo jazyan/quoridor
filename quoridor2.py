@@ -6,14 +6,23 @@ import random
 class Bar(pygame.sprite.Sprite):
    def __init__(self, color, width, height):
       pygame.sprite.Sprite.__init__(self)
-      self.image = pygame.Surface((width,height))
-      self.image = self.image.convert()
+      self.image = pygame.Surface((width,height)).convert()
       self.image.fill(color)
       self.rect = self.image.get_rect()
    def update(self,mouse):
-      if self.rect.collidepoint(mouse):
-         self.image.fill((255,0,0))
-
+      if check == 0:
+         if self.rect.collidepoint(mouse):
+            self.image.fill((255,0,0))
+            red_bar_list.add(self)
+      elif check == 1:
+         if self.rect.collidepoint(mouse):
+            for bar in red_bar_list:
+              if bar.rect.x<=self.rect.x+50 and bar.rect.x>=self.rect.x-50:
+                 if bar.rect.y == self.rect.y:
+                    self.image.fill((255,0,0))
+         #if event.key == K_LEFT:
+            #mouse[0] = x-50
+         
 class Player(pygame.sprite.Sprite):
    def __init__(self,image):
       pygame.sprite.Sprite.__init__(self)
@@ -40,6 +49,7 @@ background = back.convert()
 background.fill((255,255,255))
 
 bar_list = pygame.sprite.Group()
+red_bar_list = pygame.sprite.Group()
 player_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
@@ -50,7 +60,7 @@ bar_coord_y = [10,60,110,160,210,260,310,360,410]
 #create grid of bars
 for i in range(0,8):
    for j in range(0,9):
-      bar_vert = Bar((0,0,0),3,50)
+      bar_vert = Bar((0,0,0),5,50)
       bar_vert.rect.x = bar_coord_x[i]
       bar_vert.rect.y = bar_coord_y[j]
       bar_list.add(bar_vert)
@@ -58,7 +68,7 @@ for i in range(0,8):
 
 for i in range(0,8):
    for j in range(0,9):
-      bar_hor = Bar((0,0,0),50,3)
+      bar_hor = Bar((0,0,0),50,5)
       bar_hor.rect.x = bar_coord_y[j]
       bar_hor.rect.y = bar_coord_x[i]
       bar_list.add(bar_hor)
@@ -76,6 +86,7 @@ player2.rect.x = 222
 player2.rect.y = 370
 player_list.add(player2)
 all_sprites_list.add(player2)
+check = 0
 
 #loop through game
 while 1:
@@ -84,6 +95,8 @@ while 1:
       if event.type == QUIT:
          exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
+         if check == 0: check = 1
+         else: check = 0
          bar_list.update(mouse)
       if event.type == pygame.KEYDOWN:
          player_list.update(mouse)
