@@ -35,24 +35,40 @@ class Player(pygame.sprite.Sprite):
       self.image = pygame.image.load(image)
       self.rect = self.image.get_rect()
    def update(self,mouse):
+      test = 0
       if self.rect.collidepoint(mouse):
          if event.key == K_RIGHT:
             for bar in vert_redbar_list:
-               if bar.rect.x<=self.rect.x+50 and bar.rect.y<=self.rect.y+20:
-                  self.rect.x = self.rect.x
-                  test = 1
-               else: 
-                  self.rect.x += 50
-                  test = 0
+               if bar.rect.x<=self.rect.x+50 and bar.rect.x>=self.rect.x:
+                  if bar.rect.y<=self.rect.y+10 and bar.rect.y>=self.rect.y-10:
+                     self.rect.x = self.rect.x
+                     test = 1
+            if test == 0: self.rect.x += 50
+            if self.rect.x >= 423: self.rect.x = 423
          elif event.key == K_UP:
-            #for bar in hor_redbar_list:
-               #if bar.rect.y<=self.rect.y+50 and bar.rect.x<=self.rect.x+20:
-                  #self.rect.y = self.rect.y
-               self.rect.y -= 50.
+            for bar in hor_redbar_list:
+               if bar.rect.y>=self.rect.y-50 and bar.rect.y<=self.rect.y:
+                  if bar.rect.x<=self.rect.x+10 and bar.rect.x>=self.rect.x-10:
+                     self.rect.y = self.rect.y
+                     test = 1
+            if test == 0: self.rect.y -= 50.
+            if self.rect.y <= 20: self.rect.y = 20
          elif event.key == K_DOWN:
-            self.rect.y += 50.
+            for bar in hor_redbar_list:
+               if bar.rect.y<=self.rect.y+50 and bar.rect.y>=self.rect.y:
+                  if bar.rect.x<=self.rect.x+10 and bar.rect.x>=self.rect.y-10:
+                     self.rect.y = self.rect.y
+                     test = 1
+            if test == 0: self.rect.y += 50.
+            if self.rect.y >= 420: self.rect.y = 420
          elif event.key == K_LEFT:
-            self.rect.x -= 50.
+            for bar in vert_redbar_list:
+               if bar.rect.x>=self.rect.x-50 and bar.rect.x<=self.rect.x:
+                  if bar.rect.y<=self.rect.y+10 and bar.rect.y>=self.rect.y-10:
+                     self.rect.x = self.rect.x
+                     test = 1
+            if test == 0: self.rect.x -= 50.
+            if self.rect.x<=23: self.rect.x = 23
 
 pygame.init()
 screen = pygame.display.set_mode([470,470])
@@ -143,7 +159,7 @@ while 1:
 
 # TODO
 # double click bar = black
-# piece cannot move through red walls
+# piece cannot move through red walls (up not working?)
 # more contraints than double clicking
 # limit blocks/player (list of each player's block)
 # check if legal move is actually illegal b/c blocks off all paths
