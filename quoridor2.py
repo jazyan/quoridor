@@ -4,25 +4,31 @@ from sys import exit
 import random
 
 class Bar(pygame.sprite.Sprite):
-   def __init__(self, color, width, height):
+   def __init__(self, width, height):
       pygame.sprite.Sprite.__init__(self)
       self.image = pygame.Surface((width,height)).convert()
-      self.image.fill(color)
+      self.image.fill((0,0,0))
       self.rect = self.image.get_rect()
-   def update(self,mouse):
+   def update(self,mouse,width,height):
       if check == 0:
          if self.rect.collidepoint(mouse):
             self.image.fill((255,0,0))
-            red_bar_list.add(self)
+            if width > height:
+               hor_redbar_list.add(self)
+            elif height > width:
+               vert_redbar_list.add(self)
       elif check == 1:
-         if self.rect.collidepoint(mouse):
-            for bar in red_bar_list:
-              if bar.rect.x<=self.rect.x+50 and bar.rect.x>=self.rect.x-50:
-                 if bar.rect.y == self.rect.y:
-                    self.image.fill((255,0,0))
-         #if event.key == K_LEFT:
-            #mouse[0] = x-50
-         
+         if self.rect.collidepoint(mouse) and width > height:
+            for bar in hor_redbar_list:
+               if bar.rect.x<=self.rect.x+50 and bar.rect.x>=self.rect.x-50:
+                  if bar.rect.y == self.rect.y:
+                     self.image.fill((255,0,0))
+         elif self.rect.collidepoint(mouse) and width < height:
+            for bar in vert_redbar_list:
+               if bar.rect.y<=self.rect.y+50 and bar.rect.y>=self.rect.y-50:
+                  if bar.rect.x == self.rect.x:
+                     self.image.fill((255,0,0))
+
 class Player(pygame.sprite.Sprite):
    def __init__(self,image):
       pygame.sprite.Sprite.__init__(self)
@@ -31,9 +37,18 @@ class Player(pygame.sprite.Sprite):
    def update(self,mouse):
       if self.rect.collidepoint(mouse):
          if event.key == K_RIGHT:
-            self.rect.x += 50.
+            for bar in vert_redbar_list:
+               if bar.rect.x<=self.rect.x+50 and bar.rect.y<=self.rect.y+20:
+                  self.rect.x = self.rect.x
+                  test = 1
+               else: 
+                  self.rect.x += 50
+                  test = 0
          elif event.key == K_UP:
-            self.rect.y -= 50.
+            #for bar in hor_redbar_list:
+               #if bar.rect.y<=self.rect.y+50 and bar.rect.x<=self.rect.x+20:
+                  #self.rect.y = self.rect.y
+               self.rect.y -= 50.
          elif event.key == K_DOWN:
             self.rect.y += 50.
          elif event.key == K_LEFT:
@@ -49,7 +64,12 @@ background = back.convert()
 background.fill((255,255,255))
 
 bar_list = pygame.sprite.Group()
-red_bar_list = pygame.sprite.Group()
+hor_bar_list = pygame.sprite.Group()
+vert_bar_list = pygame.sprite.Group()
+hor_redbar_list = pygame.sprite.Group()
+vert_redbar_list = pygame.sprite.Group()
+player1_group = pygame.sprite.Group()
+player2_group = pygame.sprite.Group()
 player_list = pygame.sprite.Group()
 all_sprites_list = pygame.sprite.Group()
 
@@ -60,33 +80,39 @@ bar_coord_y = [10,60,110,160,210,260,310,360,410]
 #create grid of bars
 for i in range(0,8):
    for j in range(0,9):
-      bar_vert = Bar((0,0,0),5,50)
+      bar_vert = Bar(5,50)
       bar_vert.rect.x = bar_coord_x[i]
       bar_vert.rect.y = bar_coord_y[j]
+      vert_bar_list.add(bar_vert)
       bar_list.add(bar_vert)
       all_sprites_list.add(bar_vert)
 
 for i in range(0,8):
    for j in range(0,9):
-      bar_hor = Bar((0,0,0),50,5)
+      bar_hor = Bar(50,5)
       bar_hor.rect.x = bar_coord_y[j]
       bar_hor.rect.y = bar_coord_x[i]
+      hor_bar_list.add(bar_hor)
       bar_list.add(bar_hor)
       all_sprites_list.add(bar_hor)
 
 #create players
 player1 = Player('piece1.png')
 player1.rect.x = 223
-player1.rect.y = 70
+player1.rect.y = 20
+player1_group.add(player1)
 player_list.add(player1)
 all_sprites_list.add(player1)
 
 player2 = Player('piece2.png')
 player2.rect.x = 222
-player2.rect.y = 370
+player2.rect.y = 420
+player2_group.add(player2)
 player_list.add(player2)
 all_sprites_list.add(player2)
 check = 0
+p1_turn = 1
+num_moves = 0
 
 #loop through game
 while 1:
@@ -95,16 +121,29 @@ while 1:
       if event.type == QUIT:
          exit()
       if event.type == pygame.MOUSEBUTTONDOWN:
-         if check == 0: check = 1
+         bar_list.update(mouse,50,5)
+         bar_list.update(mouse,5,50) 
+         if check == 0: 
+            num_moves +=1
+            check = 1
          else: check = 0
-         bar_list.update(mouse)
       if event.type == pygame.KEYDOWN:
-         player_list.update(mouse)
+         if p1_turn == 1:
+            player1_group.update(mouse)
+            p1_turn = 0
+            num_moves += 1 
+         elif p1_turn == 0:
+            player2_group.update(mouse)
+            p1_turn = 1
+            num_moves += 1
    screen.blit(background,(0,0))
    pygame.draw.rect(screen,(0,0,0),Rect((10,10),(450,450)),5)
    all_sprites_list.draw(screen)
    pygame.display.update()
 
 # TODO
-# click a bar, then check bars around if legal (SPRITES)
+# double click bar = black
+# piece cannot move through red walls
+# more contraints than double clicking
+# limit blocks/player (list of each player's block)
 # check if legal move is actually illegal b/c blocks off all paths
